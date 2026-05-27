@@ -13,12 +13,6 @@ Video Game Sales with Ratings 데이터베이스에서 조카와 함께 즐길 �
 
 ## 💡 해결 방법 (SQL)
 ```sql
-SELECT 
-    game_id, 
-    name, 
-    year
-FROM 
-    games
-WHERE 
-    name LIKE '%Christmas%' 
-    OR name LIKE '%Santa%';
+select game_id, name, year
+from games
+where name LIKE '%Christmas%' OR name LIKE '%Santa%';
