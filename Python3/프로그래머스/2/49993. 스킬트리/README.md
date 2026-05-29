@@ -81,5 +81,47 @@
 </ol>
 </div>
 
-
 > 출처: 프로그래머스 코딩 테스트 연습, https://school.programmers.co.kr/learn/challenges
+
+---
+
+## 🔍 시행착오 및 해결 과정
+
+### 1. `set()`에 대한 오해 (해시 테이블의 특징)
+* **초기 접근:** 유저의 스킬트리와 선행 스킬의 교집합을 빠르게 구하기 위해 `set(list())` 구조를 고민했습니다.
+* **배운 점:** `set` 자료형은 내부적으로 **해시 테이블(Hash Table)** 구조를 사용하는 **순서가 없는(Unordered) 자료형**입니다. 원소가 적을 때 가끔 알파벳 순서대로 정렬된 것처럼 보이는 것은 단순한 우연일 뿐이며 정렬을 보장하지 않습니다. 순서 유지가 핵심인 이 문제에서는 `set`을 사용하면 데이터가 꼬이게 됩니다.
+
+### 2. `in` 연산자의 한계와 잘못된 카운트 문제
+* **추출 방식:** 유저의 스킬트리에서 선행 스킬에 포함된 글자들만 순서대로 뽑아 문자열 `f`를 만들었습니다.
+* **문제 발생:** 추출된 스킬 순서가 올바른지 판별하기 위해 `if f in skill:` 조건을 썼더니, `"BD"`와 같은 잘못된 순서가 필터링되지 않고 통과했습니다. `"BD"`는 원래 스킬인 `"CBD"`의 **부분 문자열(Substring)** 이기 때문에 `in` 연산자가 `True`를 반환하는 논리적 오류가 있었습니다. (실제로는 `C`를 배우지 않고 `B`와 `D`를 배운 것이므로 탈락해야 합니다.)
+
+---
+
+## 💡 해결 방법: 접두사(Prefix) 매칭과 `startswith()`
+
+스킬트리가 성립하려면 추출한 문자열이 원래 `skill` 문자열의 **앞부분부터 순서대로 빈틈없이 일치(접두사)**해야 합니다. 
+예를 들어 `skill`이 `"CBD"`일 때, 가능한 조합은 `""`, `"C"`, `"CB"`, `"CBD"` 뿐입니다.
+
+이를 해결하기 위해 원래 `skill` 문자열이 내가 추출한 문자열(`f`)로 시작하는지 검사하는 방식을 적용했습니다.
+
+### 💻 최종 제출 코드
+```python
+def solution(skill, skill_trees):
+    answer = 0
+    tmp_list = list(skill)
+    filter_list = []
+    
+    # 1. 유저 스킬트리에서 선행 스킬(skill)에 포함된 문자만 순서대로 추출
+    for skill_tree in skill_trees:
+        tmp_s = ''
+        for s in skill_tree:
+            if s in tmp_list:
+                tmp_s += s
+        filter_list.append(tmp_s)
+        
+    # 2. skill이 추출된 스킬 순서(f)로 시작하는지 접두사 검사
+    for f in filter_list:
+        if skill.startswith(f):
+            answer += 1
+            
+    return answer
